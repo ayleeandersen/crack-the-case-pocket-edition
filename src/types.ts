@@ -37,6 +37,8 @@ export interface Group {
   id: string;
   name: string;
   createdAt: number;
+  /** Last rename or toggle change; newest wins when merging. */
+  updatedAt: number;
   meAlsoPlaying: boolean;
 }
 
@@ -76,11 +78,17 @@ export interface Settings {
 
 export const ME = 'me';
 
+/** profileId -> cardId -> time it was un-marked, so merges don't resurrect it. */
+export type RemovedMap = { [profileId: string]: { [cardId: string]: number } };
+
 export interface Store {
-  schemaVersion: 1;
+  schemaVersion: 2;
   activeProfileId: string;
   groups: Group[];
   played: PlayedMap;
+  removed: RemovedMap;
+  /** groupId -> time it was deleted, so merges don't bring it back. */
+  deletedGroups: { [groupId: string]: number };
   filters: { [profileId: string]: Filters };
   libraryPrefs: LibraryPrefs;
   activeClock?: ClockState;

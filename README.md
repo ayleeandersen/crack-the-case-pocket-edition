@@ -38,6 +38,15 @@ The site sends `noindex`. Keep the URL private: official card text is for person
 
 Open it once while online so the service worker caches everything; after that it works in airplane mode.
 
+## Moving progress between devices
+
+Settings → **Export my progress** saves a JSON file. On the other device, **Import progress** shows what would change and offers:
+
+- **Merge** (default): combines both histories. For each card, the newest change wins, including un-marking. Deleted groups stay deleted, and groups with the same name made separately on each device are joined. The importing device keeps its own settings, filters and active profile.
+- **Replace instead**: overwrites everything on this device with the file.
+
+To sync both ways, export from the second device and import it back on the first.
+
 ## Layout
 
 ```

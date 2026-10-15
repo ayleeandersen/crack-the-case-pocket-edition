@@ -5,6 +5,7 @@ import { resetPlayed } from '../lib/played';
 import { parseImport } from '../lib/store';
 import { Button, ConfirmDialog, Segmented, SectionLabel, Toggle } from '../components/ui';
 import { IconPlus } from '../components/Icons';
+import { ImportSheet } from '../components/ImportSheet';
 
 type Pending =
   | { kind: 'resetGroup'; group: Group }
@@ -22,7 +23,7 @@ function Card({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export function GroupsScreen() {
-  const { store, update, replace, persistent } = useStore();
+  const { store, update, persistent } = useStore();
   const [pending, setPending] = useState<Pending | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
@@ -160,7 +161,10 @@ export function GroupsScreen() {
         </Card>
 
         <Card title="Progress">
-          <p className="mb-3 text-muted">Move your played history to another phone or browser.</p>
+          <p className="mb-3 text-muted">
+            Export on one device, then import on the other and choose Merge. To sync both ways, export from the second device
+            and import it back on the first.
+          </p>
           {!persistent && <p className="mb-3 text-sm">Saving is unavailable in this browser, so export before you close it.</p>}
           <div className="grid grid-cols-2 gap-2">
             <Button onClick={exportProgress}>Export my progress</Button>
@@ -210,19 +214,10 @@ export function GroupsScreen() {
         onCancel={() => setPending(null)}
         onConfirm={() => { update((s) => resetPlayed(s, ME)); setPending(null); }}
       />
-      <ConfirmDialog
-        open={pending?.kind === 'import'}
-        title="Replace progress?"
-        body={pending?.kind === 'import' && (
-          <>This replaces everything on this device with the imported file: {pending.data.groups.length} group(s), {Object.keys(pending.data.played[ME] ?? {}).length} cases played by you.</>
-        )}
-        confirmLabel="Replace"
-        danger
-        onCancel={() => setPending(null)}
-        onConfirm={() => {
-          if (pending?.kind === 'import') { replace(pending.data); setMessage('Progress imported.'); }
-          setPending(null);
-        }}
+      <ImportSheet
+        data={pending?.kind === 'import' ? pending.data : null}
+        onClose={() => setPending(null)}
+        onDone={setMessage}
       />
     </div>
   );

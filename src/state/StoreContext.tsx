@@ -52,7 +52,8 @@ export function useStore(): StoreApi {
 
 export function newGroup(name: string): Group {
   const id = `g_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-  return { id, name, createdAt: Date.now(), meAlsoPlaying: true };
+  const now = Date.now();
+  return { id, name, createdAt: now, updatedAt: now, meAlsoPlaying: true };
 }
 
 export function addGroup(s: Store, g: Group): Store {
@@ -64,20 +65,24 @@ export function addGroup(s: Store, g: Group): Store {
   };
 }
 
-export function deleteGroup(s: Store, id: string): Store {
+export function deleteGroup(s: Store, id: string, now = Date.now()): Store {
   const played = { ...s.played };
+  const removed = { ...s.removed };
   const filters = { ...s.filters };
   delete played[id];
+  delete removed[id];
   delete filters[id];
   return {
     ...s,
     groups: s.groups.filter((g) => g.id !== id),
     played,
+    removed,
     filters,
+    deletedGroups: { ...s.deletedGroups, [id]: now },
     activeProfileId: s.activeProfileId === id ? ME : s.activeProfileId,
   };
 }
 
-export function patchGroup(s: Store, id: string, patch: Partial<Group>): Store {
-  return { ...s, groups: s.groups.map((g) => (g.id === id ? { ...g, ...patch } : g)) };
+export function patchGroup(s: Store, id: string, patch: Partial<Group>, now = Date.now()): Store {
+  return { ...s, groups: s.groups.map((g) => (g.id === id ? { ...g, ...patch, updatedAt: now } : g)) };
 }

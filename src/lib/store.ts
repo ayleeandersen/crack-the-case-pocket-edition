@@ -1,16 +1,18 @@
 import { DECKS, DIFFICULTIES, ME, type Deck, type Difficulty, type Filters, type Store } from '../types';
 
 export const STORAGE_KEY = 'ctc:v1';
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const defaultFilters = (): Filters => ({ difficulties: [...DIFFICULTIES], decks: [...DECKS] });
 
 export function defaultStore(): Store {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     activeProfileId: ME,
     groups: [],
     played: { [ME]: {} },
+    removed: {},
+    deletedGroups: {},
     filters: { [ME]: defaultFilters() },
     libraryPrefs: { status: 'all', sort: 'number', ...defaultFilters() },
     settings: { confirmClues: true, theme: 'system', textSize: 'normal' },
@@ -33,27 +35,45 @@ function cleanFilters(v: unknown): Filters {
 }
 
 /**
- * Brings any stored shape up to the current schema. Add a case per future version:
- * e.g. `if (version === 1) { raw = upgrade1to2(raw); version = 2; }`.
+ * Brings any stored shape up to the current schema, one version at a time.
+ * Add a step per future version, then let normalize() fill gaps and drop junk.
  */
 export function migrate(input: unknown): Store {
   if (!isObj(input)) return defaultStore();
-  const version = typeof input.schemaVersion === 'number' ? input.schemaVersion : 0;
+  let raw: Record<string, unknown> = input;
+  let version = typeof raw.schemaVersion === 'number' ? raw.schemaVersion : 0;
   if (version > SCHEMA_VERSION) throw new Error('This progress file is from a newer version of the app.');
-  // version 0 → 1: nothing to transform; normalization below fills gaps.
-  return normalize(input);
+  // 0 → 1: nothing to transform.
+  if (version < 1) version = 1;
+  // 1 → 2: adds removal markers and group edit times, used for merging imports.
+  if (version === 1) {
+    raw = { ...raw, removed: {}, deletedGroups: {} };
+    version = 2;
+  }
+  return normalize(raw);
 }
+
+const isTimeMap = (v: unknown): Record<string, number> =>
+  isObj(v) ? Object.fromEntries(Object.entries(v).filter(([, t]) => typeof t === 'number')) as Record<string, number> : {};
 
 /** Fills missing fields with defaults and drops anything malformed. */
 function normalize(raw: Record<string, unknown>): Store {
   const base = defaultStore();
+  const deletedGroups = isTimeMap(raw.deletedGroups);
   const groups = Array.isArray(raw.groups)
-    ? raw.groups.filter(isObj).filter((g) => typeof g.id === 'string' && typeof g.name === 'string').map((g) => ({
-        id: g.id as string,
-        name: g.name as string,
-        createdAt: typeof g.createdAt === 'number' ? g.createdAt : Date.now(),
-        meAlsoPlaying: g.meAlsoPlaying !== false,
-      }))
+    ? raw.groups
+        .filter(isObj)
+        .filter((g) => typeof g.id === 'string' && typeof g.name === 'string' && !((g.id as string) in deletedGroups))
+        .map((g) => {
+          const createdAt = typeof g.createdAt === 'number' ? g.createdAt : Date.now();
+          return {
+            id: g.id as string,
+            name: g.name as string,
+            createdAt,
+            updatedAt: typeof g.updatedAt === 'number' ? g.updatedAt : createdAt,
+            meAlsoPlaying: g.meAlsoPlaying !== false,
+          };
+        })
     : [];
   const profileIds = new Set([ME, ...groups.map((g) => g.id)]);
 
@@ -75,16 +95,29 @@ function normalize(raw: Record<string, unknown>): Store {
     }
   }
 
+  const removed: Store['removed'] = {};
+  if (isObj(raw.removed)) {
+    for (const [pid, recs] of Object.entries(raw.removed)) {
+      if (!profileIds.has(pid)) continue;
+      const times = isTimeMap(recs);
+      // A card can't be both played and removed; the record already won when it was written.
+      for (const cid of Object.keys(times)) if (played[pid]?.[cid]) delete times[cid];
+      if (Object.keys(times).length) removed[pid] = times;
+    }
+  }
+
   const filters: Store['filters'] = {};
   for (const pid of profileIds) filters[pid] = cleanFilters(isObj(raw.filters) ? raw.filters[pid] : undefined);
 
   const lp = isObj(raw.libraryPrefs) ? raw.libraryPrefs : {};
   const s = isObj(raw.settings) ? raw.settings : {};
   const store: Store = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     activeProfileId: typeof raw.activeProfileId === 'string' && profileIds.has(raw.activeProfileId) ? raw.activeProfileId : ME,
     groups,
     played,
+    removed,
+    deletedGroups,
     filters,
     libraryPrefs: {
       ...cleanFilters(lp),

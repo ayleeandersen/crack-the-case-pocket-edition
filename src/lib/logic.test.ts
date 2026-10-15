@@ -6,6 +6,8 @@ import { finishTargets, markFinished, resetPlayed, setPlayedManual } from './pla
 import { MINUTE, pointsFor, scoringMinute, effectiveMs } from './scoring';
 import { elapsedMs, newClock, pause, reset, revealClue, start } from './clock';
 import { defaultStore, migrate, parseImport } from './store';
+import { mergeStores } from './merge';
+import { addGroup, deleteGroup, patchGroup } from '../state/StoreContext';
 
 const card = (id: string, difficulty: Card['difficulty'], source: Card['source']): Card => ({
   id, number: 0, source, title: id, difficulty, case: [], mystery: '', clues: ['', ''],
@@ -65,7 +67,7 @@ describe('played rules', () => {
   const withGroup = (meAlsoPlaying: boolean): Store => ({
     ...defaultStore(),
     activeProfileId: 'g1',
-    groups: [{ id: 'g1', name: 'Friday Crew', createdAt: 0, meAlsoPlaying }],
+    groups: [{ id: 'g1', name: 'Friday Crew', createdAt: 0, updatedAt: 0, meAlsoPlaying }],
   });
 
   test('as Me, finishing marks only Me', () => {
@@ -97,9 +99,18 @@ describe('played rules', () => {
   test('reset clears only the given cards for the given profile', () => {
     let s = markFinished(withGroup(true), 'a', 6, 1);
     s = markFinished(s, 'b', 6, 1);
-    s = resetPlayed(s, 'g1', ['a']);
+    s = resetPlayed(s, 'g1', ['a'], 5);
     expect(Object.keys(s.played.g1!)).toEqual(['b']);
     expect(Object.keys(s.played.me!).sort()).toEqual(['a', 'b']);
+    expect(s.removed.g1).toEqual({ a: 5 });
+  });
+
+  test('un-marking records a removal time; re-marking clears it', () => {
+    let s = setPlayedManual(defaultStore(), 'me', '9', true, 1);
+    s = setPlayedManual(s, 'me', '9', false, 2);
+    expect(s.removed.me).toEqual({ '9': 2 });
+    s = markFinished(s, '9', 5, 3);
+    expect(s.removed.me).toEqual({});
   });
 });
 
@@ -165,7 +176,7 @@ describe('clock', () => {
 
 describe('persistence', () => {
   test('round-trips through export/import', () => {
-    const s = markFinished({ ...defaultStore(), groups: [{ id: 'g', name: 'Fam', createdAt: 1, meAlsoPlaying: false }], activeProfileId: 'g' }, '7', 4, 9);
+    const s = markFinished({ ...defaultStore(), groups: [{ id: 'g', name: 'Fam', createdAt: 1, updatedAt: 1, meAlsoPlaying: false }], activeProfileId: 'g' }, '7', 4, 9);
     expect(parseImport(JSON.stringify(s))).toEqual(migrate(s));
     expect(parseImport(JSON.stringify(s)).played.g!['7']?.points).toBe(4);
   });
@@ -175,9 +186,107 @@ describe('persistence', () => {
     expect(() => parseImport('{"hello":1}')).toThrow();
   });
 
+  test('v1 data migrates to v2 with empty removal markers', () => {
+    const v1 = { schemaVersion: 1, activeProfileId: 'g', groups: [{ id: 'g', name: 'Fam', createdAt: 7, meAlsoPlaying: true }], played: { me: { '1': { playedAt: 1, points: 6 } } } };
+    const s = migrate(v1);
+    expect(s.schemaVersion).toBe(2);
+    expect(s.removed).toEqual({});
+    expect(s.deletedGroups).toEqual({});
+    expect(s.groups[0]!.updatedAt).toBe(7);
+    expect(s.played.me!['1']?.points).toBe(6);
+  });
+
   test('migration repairs empty filters and unknown active profile', () => {
     const s = migrate({ schemaVersion: 1, activeProfileId: 'ghost', groups: [], played: {}, filters: { me: { difficulties: [], decks: [] } } });
     expect(s.activeProfileId).toBe('me');
     expect(s.filters.me!.difficulties).toHaveLength(3);
+  });
+});
+
+describe('merging imports', () => {
+  const g = (id: string, name: string, t = 1) => ({ id, name, createdAt: t, updatedAt: t, meAlsoPlaying: true });
+  const rec = (playedAt: number, points: 0 | 4 | 5 | 6 | null = 6) => ({ playedAt, points });
+
+  test('combines played history from both devices', () => {
+    let a = markFinished(defaultStore(), '1', 6, 10);
+    let b = markFinished(defaultStore(), '2', 4, 20);
+    const { store, summary } = mergeStores(a, b);
+    expect(Object.keys(store.played.me!).sort()).toEqual(['1', '2']);
+    expect(summary.played).toEqual([{ name: 'Me', added: 1, removed: 0 }]);
+    expect(summary.changed).toBe(true);
+    a = store;
+    b = mergeStores(b, a).store;
+    expect(b.played).toEqual(a.played);
+  });
+
+  test('a newer removal beats an older play, and a newer play beats an older removal', () => {
+    const played = setPlayedManual(defaultStore(), 'me', '5', true, 10);
+    const unmarked = setPlayedManual(played, 'me', '5', false, 20);
+    expect(mergeStores(played, unmarked).store.played.me!['5']).toBeUndefined();
+    expect(mergeStores(unmarked, played).store.played.me!['5']).toBeUndefined();
+    const replayed = markFinished(unmarked, '5', 5, 30);
+    expect(mergeStores(unmarked, replayed).store.played.me!['5']?.points).toBe(5);
+  });
+
+  test('the newest record wins when both devices played the same card', () => {
+    const a: Store = { ...defaultStore(), played: { me: { '3': rec(10, 4) } } };
+    const b: Store = { ...defaultStore(), played: { me: { '3': rec(20, 6) } } };
+    expect(mergeStores(a, b).store.played.me!['3']?.points).toBe(6);
+    expect(mergeStores(b, a).store.played.me!['3']?.points).toBe(6);
+  });
+
+  test('joins same-named groups made separately and converges on one id', () => {
+    const a = markFinished({ ...addGroup(defaultStore(), g('g_b', 'Friday Crew')), activeProfileId: 'g_b' }, '1', 6, 10);
+    const b = markFinished({ ...addGroup(defaultStore(), g('g_a', 'friday crew ')), activeProfileId: 'g_a' }, '2', 5, 20);
+    const ab = mergeStores(a, b);
+    expect(ab.summary.groupsMatched).toEqual(['Friday Crew']);
+    expect(ab.summary.groupsRenamed).toEqual([]);
+    expect(ab.store.groups[0]!.name).toBe('Friday Crew');
+    // Re-importing the same file after the join is a no-op.
+    expect(mergeStores(ab.store, b).summary.changed).toBe(false);
+    expect(ab.store.groups.map((x) => x.id)).toEqual(['g_a']);
+    expect(ab.store.activeProfileId).toBe('g_a');
+    expect(Object.keys(ab.store.played.g_a!).sort()).toEqual(['1', '2']);
+    // The other device ends up with the same id, so the next sync matches by id.
+    const ba = mergeStores(b, ab.store);
+    expect(ba.store.groups.map((x) => x.id)).toEqual(['g_a']);
+    expect(ba.store.played).toEqual(ab.store.played);
+  });
+
+  test('deleted groups stay deleted on both sides', () => {
+    const both = addGroup(defaultStore(), g('g1', 'Family'));
+    const deleted = deleteGroup(both, 'g1', 50);
+    const r1 = mergeStores(both, deleted);
+    expect(r1.store.groups).toEqual([]);
+    expect(r1.store.played.g1).toBeUndefined();
+    expect(r1.summary.groupsDeleted).toEqual(['Family']);
+    expect(mergeStores(deleted, both).store.groups).toEqual([]);
+  });
+
+  test('the latest rename wins', () => {
+    const base = addGroup(defaultStore(), g('g1', 'Family'));
+    const renamed = patchGroup(base, 'g1', { name: 'The Fam' }, 99);
+    const r = mergeStores(base, renamed);
+    expect(r.store.groups[0]!.name).toBe('The Fam');
+    expect(r.summary.groupsRenamed).toEqual(['Family → The Fam']);
+    expect(mergeStores(renamed, base).store.groups[0]!.name).toBe('The Fam');
+  });
+
+  test('keeps this device’s settings, filters and active profile', () => {
+    const a: Store = { ...defaultStore(), settings: { confirmClues: false, theme: 'dark', textSize: 'large' } };
+    const b: Store = { ...addGroup(defaultStore(), g('g1', 'Fam')), activeProfileId: 'g1' };
+    const r = mergeStores(a, b).store;
+    expect(r.settings).toEqual(a.settings);
+    expect(r.activeProfileId).toBe('me');
+    expect(r.filters.g1).toBeDefined();
+  });
+
+  test('merging the same file twice changes nothing the second time', () => {
+    const a = markFinished(defaultStore(), '1', 6, 10);
+    const b = markFinished(addGroup(defaultStore(), g('g1', 'Fam')), '2', 4, 20);
+    const once = mergeStores(a, b).store;
+    const twice = mergeStores(once, b);
+    expect(twice.store).toEqual(once);
+    expect(twice.summary.changed).toBe(false);
   });
 });
