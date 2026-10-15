@@ -158,7 +158,7 @@ function CaseView({ card }: { card: Card }) {
             return (
               <Toggle
                 key={p.id}
-                label={`${p.name}: ${played ? 'played' : 'not played'}`}
+                label={p.id === ME ? `I have ${played ? '' : 'not '}played this one` : `${p.name} ${played ? 'has' : 'has not'} played this one`}
                 checked={played}
                 onChange={(v) => update((s) => setPlayedManual(s, p.id, card.id, v, Date.now()))}
               />

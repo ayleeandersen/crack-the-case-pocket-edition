@@ -7,7 +7,7 @@ import { matchesFilters } from '../lib/selection';
 import { isPlayed, setPlayedManual } from '../lib/played';
 import { DifficultyDot, Segmented, Sheet, Toggle } from '../components/ui';
 import { FilterChips } from '../components/FilterChips';
-import { IconCheck, IconMore, IconSearch } from '../components/Icons';
+import { IconCheck, IconChevronDown, IconMore, IconSearch } from '../components/Icons';
 
 function progressLine(store: Store, profileId: string, name: string): string {
   const played = store.played[profileId] ?? {};
@@ -75,15 +75,18 @@ export function LibraryScreen() {
           <p className="text-sm text-muted" aria-live="polite">{list.length} {list.length === 1 ? 'case' : 'cases'}</p>
           <label className="flex items-center gap-2 text-sm">
             <span className="text-muted">Sort</span>
+            <span className="relative">
             <select
               value={prefs.sort}
               onChange={(e) => setPrefs({ sort: e.target.value as LibraryPrefs['sort'] })}
-              className="min-h-11 rounded-xl border border-line bg-surface px-3 font-semibold"
+              className="min-h-11 appearance-none rounded-xl border border-line bg-surface pl-3 pr-10 font-semibold"
             >
               <option value="number">Card number</option>
               <option value="title">Title A–Z</option>
               <option value="recent">Recently played</option>
             </select>
+            <IconChevronDown width={18} height={18} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+            </span>
           </label>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import type { Difficulty } from '../types';
 import { IconCheck, IconClose } from './Icons';
 
@@ -115,7 +116,8 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
     };
   }, [open]);
   if (!open) return null;
-  return (
+  // Portaled to <body> so a parent's stacking context (e.g. the sticky header) can't put it under the tab bar.
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center" role="presentation">
       <div className="absolute inset-0 bg-black/55" onClick={onClose} aria-hidden />
       <div
@@ -134,7 +136,8 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
         </div>
         <div className="px-5 pb-6 pt-4">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

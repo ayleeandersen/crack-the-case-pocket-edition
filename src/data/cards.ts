@@ -23,12 +23,12 @@ if (import.meta.env.DEV) validate(cards);
 
 export const cardById = new Map(cards.map((c) => [c.id, c]));
 
-/** Official 1–108 first, then AI Generated O1–O100. */
+/** Official 1–108 first, then AI Cards 1–100. */
 export function compareByNumber(a: Card, b: Card): number {
   if (a.source !== b.source) return a.source === 'official' ? -1 : 1;
   return a.number - b.number;
 }
 
 export function cardLabel(card: Card): string {
-  return card.source === 'official' ? `Card ${card.number}` : `AI Generated ${card.id}`;
+  return card.source === 'official' ? `Card ${card.number}` : `AI Card ${card.number}`;
 }
