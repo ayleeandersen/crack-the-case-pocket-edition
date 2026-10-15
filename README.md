@@ -1,4 +1,4 @@
-# Crack the Case Pocket
+# Crack the Case Pocket Edition
 
 A private, offline, mobile-first PWA that replaces the *Crack the Case* card deck. React + TypeScript + Vite + Tailwind, no backend, all state in `localStorage` (`ctc:v1`).
 

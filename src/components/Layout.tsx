@@ -10,7 +10,7 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-[640px] items-center justify-between gap-3 px-4">
         <h1 className="min-w-0 font-serif text-[18px] font-bold leading-none tracking-tight">
           <span className="whitespace-nowrap">Crack the Case</span>
-          <span className="mt-0.5 block text-[12px] font-normal italic opacity-80">Pocket</span>
+          <span className="mt-0.5 block text-[12px] font-normal italic opacity-80">Pocket Edition</span>
         </h1>
         <ProfileSwitcher />
       </div>

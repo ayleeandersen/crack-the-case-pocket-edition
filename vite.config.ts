@@ -12,7 +12,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Crack the Case Pocket',
+        name: 'Crack the Case Pocket Edition',
         short_name: 'Crack the Case',
         description: 'A pocket murder-mystery party game.',
         start_url: '/',
