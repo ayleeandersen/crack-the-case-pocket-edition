@@ -16,7 +16,7 @@ export function FilterChips({ value, onChange }: { value: Filters; onChange: (f:
         label="Deck"
         options={DECKS}
         selected={value.decks}
-        render={(d) => (d === 'official' ? 'Official' : 'Originals')}
+        render={(d) => (d === 'official' ? 'Official' : 'AI Generated')}
         onChange={(decks) => onChange({ ...value, decks })}
       />
     </div>

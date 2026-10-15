@@ -155,7 +155,6 @@ function LibraryRow({ card, meplayed, groupName, groupPlayed, onOpen, onMenu }: 
           <span className="block truncate font-serif text-[17px] font-bold">{card.title}</span>
           <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted">
             <span>{cardLabel(card)}</span>
-            {card.source === 'original' && <span className="rounded-full border border-line px-1.5 py-px font-semibold">Original</span>}
             {meplayed && <span className="font-semibold text-ok">✓ You</span>}
             {groupName && groupPlayed && <span className="font-semibold text-ok">✓ {groupName}</span>}
           </span>

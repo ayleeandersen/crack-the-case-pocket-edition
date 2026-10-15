@@ -187,7 +187,7 @@ export function GroupsScreen() {
             the group reaches The Solution, the more points it earns.
           </p>
           <p className="mt-4 text-sm text-muted">
-            Crack the Case ©1993 Milton Bradley. Official card text is included for personal use only. Originals are fan-written.
+            Crack the Case ©1993 Milton Bradley. Official card text is included for personal use only. AI Generated cases are not part of the official game.
           </p>
         </Card>
       </main>
