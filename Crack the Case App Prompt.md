@@ -1,4 +1,4 @@
-# Build "Crack the Case Pocket": a mobile-first murder-mystery party game web app
+# Build "Crack the Case Pocket Edition": a mobile-first murder-mystery party game web app
 
 You are building a complete, working web app from this spec. Read the whole thing before writing code. When something here is ambiguous, choose the simplest option that fits the spirit of the spec, and list the choices you made at the end.
 
