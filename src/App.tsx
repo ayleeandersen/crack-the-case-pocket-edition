@@ -37,9 +37,9 @@ export function App() {
           <Route element={<TabLayout />}>
             <Route path="/play" element={<PlayScreen />} />
             <Route path="/library" element={<LibraryScreen />} />
+            <Route path="/groups" element={<GroupsScreen />} />
           </Route>
           <Route path="/case/:id" element={<CaseScreen />} />
-          <Route path="/groups" element={<GroupsScreen />} />
           <Route path="*" element={<Navigate to="/play" replace />} />
         </Routes>
       </BrowserRouter>

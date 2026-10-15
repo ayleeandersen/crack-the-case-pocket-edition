@@ -3,9 +3,8 @@ import { ME, type Group, type Settings, type Store } from '../types';
 import { addGroup, deleteGroup, newGroup, patchGroup, useStore } from '../state/StoreContext';
 import { resetPlayed } from '../lib/played';
 import { parseImport } from '../lib/store';
-import { useGoBack } from '../lib/hooks';
 import { Button, ConfirmDialog, Segmented, SectionLabel, Toggle } from '../components/ui';
-import { IconBack, IconPlus } from '../components/Icons';
+import { IconPlus } from '../components/Icons';
 
 type Pending =
   | { kind: 'resetGroup'; group: Group }
@@ -24,7 +23,6 @@ function Card({ title, children }: { title: string; children: ReactNode }) {
 
 export function GroupsScreen() {
   const { store, update, replace, persistent } = useStore();
-  const goBack = useGoBack();
   const [pending, setPending] = useState<Pending | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
@@ -64,17 +62,9 @@ export function GroupsScreen() {
   };
 
   return (
-    <div className="min-h-dvh pb-[calc(2rem+env(safe-area-inset-bottom))]">
-      <header className="pt-safe sticky top-0 z-30 bg-band text-band-ink shadow-md">
-        <div className="mx-auto flex h-14 max-w-[640px] items-center gap-2 px-2">
-          <button type="button" onClick={goBack} className="grid size-11 place-items-center rounded-full active:bg-white/10" aria-label="Back">
-            <IconBack />
-          </button>
-          <h1 className="font-serif text-lg font-bold">Groups &amp; settings</h1>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-[640px] space-y-7 px-4 pt-5">
+    <div className="pb-6">
+      <div className="space-y-7 px-4 pt-5">
+        <h2 className="font-serif text-2xl font-bold text-title">Groups &amp; settings</h2>
         {message && (
           <p role="alert" className="rounded-xl border border-callout-line bg-callout p-3">{message}</p>
         )}
@@ -190,7 +180,7 @@ export function GroupsScreen() {
             Crack the Case ©1993 Milton Bradley. Official card text is included for personal use only. AI Generated cases are not part of the official game.
           </p>
         </Card>
-      </main>
+      </div>
 
       <ConfirmDialog
         open={pending?.kind === 'resetGroup'}

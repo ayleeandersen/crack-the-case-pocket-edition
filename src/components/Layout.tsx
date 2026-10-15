@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useStore } from '../state/StoreContext';
 import { ProfileSwitcher } from './ProfileSwitcher';
-import { IconBook, IconClose, IconDice } from './Icons';
+import { IconBook, IconClose, IconDice, IconSettings } from './Icons';
 
 export function Header() {
   return (
@@ -60,6 +60,7 @@ export function TabLayout() {
         <div className="mx-auto flex max-w-[640px]">
           <Tab to="/play" label="Play" icon={<IconDice />} />
           <Tab to="/library" label="Library" icon={<IconBook />} />
+          <Tab to="/groups" label="Settings" icon={<IconSettings />} />
         </div>
       </nav>
     </div>
