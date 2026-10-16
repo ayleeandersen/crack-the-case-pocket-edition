@@ -148,7 +148,7 @@ export function GroupsScreen() {
                 label="Text size"
                 value={store.settings.textSize}
                 onChange={(v) => setSetting('textSize', v)}
-                options={[{ value: 'normal', label: 'Normal' }, { value: 'large', label: 'Large' }]}
+                options={[{ value: 'small', label: 'Small' }, { value: 'normal', label: 'Normal' }, { value: 'large', label: 'Large' }]}
               />
             </div>
             <Toggle

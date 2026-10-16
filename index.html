@@ -19,6 +19,8 @@
         var t = (s.settings && s.settings.theme) || 'system';
         if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches))
           document.documentElement.classList.add('dark');
+        var z = s.settings && s.settings.textSize;
+        if (z === 'small' || z === 'large') document.documentElement.classList.add('text-' + z);
       } catch (e) {}
     </script>
   </head>

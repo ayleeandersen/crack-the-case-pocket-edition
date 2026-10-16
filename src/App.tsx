@@ -23,6 +23,7 @@ function Appearance() {
     return () => mq.removeEventListener('change', apply);
   }, [theme]);
   useEffect(() => {
+    document.documentElement.classList.toggle('text-small', textSize === 'small');
     document.documentElement.classList.toggle('text-large', textSize === 'large');
   }, [textSize]);
   return null;

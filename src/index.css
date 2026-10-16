@@ -73,6 +73,7 @@
   color-scheme: dark;
 }
 
+.text-small { --reading-size: 17px; }
 .text-large { --reading-size: 23px; }
 
 @theme inline {

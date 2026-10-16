@@ -127,7 +127,7 @@ function normalize(raw: Record<string, unknown>): Store {
     settings: {
       confirmClues: s.confirmClues !== false,
       theme: ['system', 'light', 'dark'].includes(s.theme as string) ? (s.theme as Store['settings']['theme']) : base.settings.theme,
-      textSize: s.textSize === 'large' ? 'large' : 'normal',
+      textSize: s.textSize === 'large' || s.textSize === 'small' ? s.textSize : 'normal',
     },
   };
   const c = raw.activeClock;

@@ -114,7 +114,7 @@ function CaseView({ card }: { card: Card }) {
       </header>
 
       <main className="mx-auto max-w-[640px] space-y-6 px-4 pt-5">
-        <h1 className="font-serif text-[30px] font-bold leading-tight text-title">{card.title}</h1>
+        <h1 className="font-serif text-[calc(var(--reading-size)*1.5)] font-bold leading-tight text-title">{card.title}</h1>
 
         <section aria-labelledby="case-h">
           <SectionLabel className="mb-2"><span id="case-h">The Case</span></SectionLabel>

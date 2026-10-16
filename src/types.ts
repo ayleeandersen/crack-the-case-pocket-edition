@@ -73,7 +73,7 @@ export interface ClockState {
 export interface Settings {
   confirmClues: boolean;
   theme: 'system' | 'light' | 'dark';
-  textSize: 'normal' | 'large';
+  textSize: 'small' | 'normal' | 'large';
 }
 
 export const ME = 'me';

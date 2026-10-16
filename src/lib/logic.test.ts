@@ -196,6 +196,11 @@ describe('persistence', () => {
     expect(s.played.me!['1']?.points).toBe(6);
   });
 
+  test('text size accepts small and falls back to normal', () => {
+    expect(migrate({ ...defaultStore(), settings: { confirmClues: true, theme: 'system', textSize: 'small' } }).settings.textSize).toBe('small');
+    expect(migrate({ ...defaultStore(), settings: { confirmClues: true, theme: 'system', textSize: 'huge' } }).settings.textSize).toBe('normal');
+  });
+
   test('migration repairs empty filters and unknown active profile', () => {
     const s = migrate({ schemaVersion: 1, activeProfileId: 'ghost', groups: [], played: {}, filters: { me: { difficulties: [], decks: [] } } });
     expect(s.activeProfileId).toBe('me');
