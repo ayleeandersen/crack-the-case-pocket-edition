@@ -32,7 +32,7 @@ export function App() {
   return (
     <StoreProvider>
       <Appearance />
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
         <Routes>
           <Route element={<TabLayout />}>
             <Route path="/play" element={<PlayScreen />} />
