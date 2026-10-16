@@ -63,7 +63,7 @@ export function ManualTierSheet({ open, timetable, onPick, onClose }: {
             key={o.points}
             type="button"
             onClick={() => onPick(o.points)}
-            className="flex min-h-14 w-full items-center gap-4 rounded-2xl border border-line bg-paper px-4 text-left active:bg-surface-2"
+            className="flex min-h-12 w-full items-center gap-4 rounded-2xl border border-line bg-paper px-4 text-left active:bg-surface-2"
           >
             <span className="w-8 text-center font-serif text-2xl font-bold text-title">{o.points}</span>
             <span className="flex-1">

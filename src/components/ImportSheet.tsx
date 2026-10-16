@@ -42,7 +42,6 @@ export function ImportSheet({ data, onClose, onDone }: { data: Store | null; onC
               <div className="grid gap-2 pt-1">
                 <Button
                   variant="primary"
-                  className="min-h-13"
                   onClick={() => { update((s) => mergeStores(s, data).store); onDone(summary.changed ? 'Progress merged.' : 'Already up to date.'); close(); }}
                 >
                   Merge

@@ -47,7 +47,7 @@ export function CluesPanel({ clues, revealed, onReveal, disabled }: {
             type="button"
             disabled={disabled}
             onClick={() => request(i)}
-            className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-dashed border-line bg-surface px-4 text-left text-[17px] font-semibold active:bg-surface-2 disabled:opacity-50"
+            className="flex min-h-12 w-full items-center gap-3 rounded-2xl border border-dashed border-line bg-surface px-4 text-left text-[16px] font-semibold active:bg-surface-2 disabled:opacity-50"
           >
             <IconBulb className="text-muted" />
             Reveal Clue {i + 1} <span className="font-normal text-muted">(+{CLUE_PENALTY[i]} min)</span>

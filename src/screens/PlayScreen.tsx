@@ -67,7 +67,7 @@ export function PlayScreen() {
 
       <div className="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-10 -mx-4 mt-6 bg-gradient-to-t from-paper via-paper to-transparent px-4 pb-3 pt-6">
         {poolCount > 0 ? (
-          <Button variant="primary" className="min-h-16 w-full rounded-2xl text-[20px]" onClick={() => nextCase()}>
+          <Button variant="primary" className="min-h-12 w-full rounded-2xl text-[17px]" onClick={() => nextCase()}>
             <IconDice /> Next Case
           </Button>
         ) : (
@@ -75,7 +75,7 @@ export function PlayScreen() {
             <p className="font-serif text-2xl font-bold text-title">All caught up!</p>
             <p className="mt-1 text-muted">{activeName} has played every case that matches these filters.</p>
             <div className="mt-4 grid gap-2">
-              <Button variant="primary" className="min-h-13" onClick={() => nextCase({ includePlayed: true })}>Include played cases</Button>
+              <Button variant="primary" onClick={() => nextCase({ includePlayed: true })}>Include played cases</Button>
               <Button onClick={() => setConfirmReset(true)}>Reset played history for these filters</Button>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { ChipGroup, DIFF_BG } from './ui';
 
 export function FilterChips({ value, onChange }: { value: Filters; onChange: (f: Filters) => void }) {
   return (
-    <div className="space-y-3">
+    <div>
       <ChipGroup
         label="Difficulty"
         options={DIFFICULTIES}

@@ -102,7 +102,7 @@ function CaseView({ card }: { card: Card }) {
   const profiles = [{ id: meId, name: 'Me' }, ...(activeGroup ? [{ id: activeGroup.id, name: activeGroup.name }] : [])];
 
   return (
-    <div className="min-h-dvh pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+    <div className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
       <header className="pt-safe sticky top-0 z-30 bg-band text-band-ink shadow-md">
         <div className="mx-auto flex h-14 max-w-[640px] items-center gap-2 px-2">
           <button type="button" onClick={goBack} className="grid size-11 place-items-center rounded-full active:bg-white/10" aria-label="Back">
@@ -168,7 +168,7 @@ function CaseView({ card }: { card: Card }) {
       </main>
 
       <div className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[640px] gap-2 px-3 py-3">
+        <div className="mx-auto flex max-w-[640px] gap-2 px-3 py-2">
           {outcome ? (
             <>
               <Button className="flex-1" onClick={goBack}>Back</Button>
@@ -176,9 +176,9 @@ function CaseView({ card }: { card: Card }) {
             </>
           ) : (
             <>
-              <Button variant="primary" className="min-h-13 flex-[2] text-[17px]" onClick={onSolved}>Solved!</Button>
-              <Button className="min-h-13 flex-1" onClick={onGaveUp}>Gave up</Button>
-              <Button variant="ghost" className="min-h-13 flex-1 text-muted" onClick={onSkip}>Skip</Button>
+              <Button variant="primary" className="flex-[2] text-[16px]" onClick={onSolved}>Solved!</Button>
+              <Button className="flex-1" onClick={onGaveUp}>Gave up</Button>
+              <Button variant="ghost" className="flex-1 text-muted" onClick={onSkip}>Skip</Button>
             </>
           )}
         </div>

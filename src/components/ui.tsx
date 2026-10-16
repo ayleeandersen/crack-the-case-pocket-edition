@@ -31,7 +31,7 @@ export function Button({
   return (
     <button
       type="button"
-      className={`inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 font-semibold disabled:opacity-50 ${VARIANTS[variant]} ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3.5 text-[15px] font-semibold disabled:opacity-50 ${VARIANTS[variant]} ${className}`}
       {...rest}
     >
       {children}
@@ -57,13 +57,18 @@ export function Chip({
         onToggle();
       }}
       onAnimationEnd={() => setShaking(false)}
-      className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-[15px] font-semibold transition-colors ${
-        pressed ? 'border-pressed-line bg-pressed text-pressed-ink' : 'border-line border-dashed bg-transparent text-muted'
-      } ${shaking ? 'shake' : ''}`}
+      // The button is the full 44px tap target; the 36px pill is drawn inside it.
+      className={`chip group inline-flex h-11 items-center ${shaking ? 'shake' : ''}`}
     >
-      {pressed ? <IconCheck width={16} height={16} strokeWidth={3} /> : color && <span aria-hidden className={`${color} size-2.5 rounded-full opacity-60`} />}
-      {pressed && color && <span aria-hidden className={`${color} size-2.5 rounded-full ring-2 ring-white/70`} />}
-      {label}
+      <span
+        className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[14px] font-semibold transition-colors group-focus-visible:outline-3 group-focus-visible:outline-offset-2 group-focus-visible:outline-[#e2a33b] ${
+          pressed ? 'border-pressed-line bg-pressed text-pressed-ink' : 'border-line border-dashed bg-transparent text-muted'
+        }`}
+      >
+        {pressed ? <IconCheck width={14} height={14} strokeWidth={3} /> : color && <span aria-hidden className={`${color} size-2.5 rounded-full opacity-60`} />}
+        {pressed && color && <span aria-hidden className={`${color} size-2.5 rounded-full ring-2 ring-white/70`} />}
+        {label}
+      </span>
     </button>
   );
 }
@@ -80,7 +85,7 @@ export function ChipGroup<T extends string>({
   colors?: Partial<Record<T, string>>;
 }) {
   return (
-    <div role="group" aria-label={label} className="flex flex-wrap gap-2">
+    <div role="group" aria-label={label} className="flex flex-wrap gap-x-2">
       {options.map((o) => {
         const on = selected.includes(o);
         return (

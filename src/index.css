@@ -115,7 +115,7 @@ body { font-family: var(--font-sans); min-height: 100dvh; }
 .reading p + p { margin-top: 0.85em; }
 .reading p.setapart { text-align: center; letter-spacing: 0.04em; }
 
-:focus-visible:not([tabindex="-1"]) { outline: 3px solid #e2a33b; outline-offset: 2px; border-radius: 6px; }
+:focus-visible:not([tabindex="-1"]):not(.chip) { outline: 3px solid #e2a33b; outline-offset: 2px; border-radius: 6px; }
 
 .pt-safe { padding-top: env(safe-area-inset-top); }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
@@ -136,5 +136,7 @@ body { font-family: var(--font-sans); min-height: 100dvh; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .shake { outline: 3px solid var(--accent); }
 }
+
+.chip:focus-visible { outline: none; }
 
 .row-cv { content-visibility: auto; contain-intrinsic-size: auto 64px; }

@@ -12,7 +12,7 @@ export const ModeratorSection = forwardRef<HTMLElement, { card: Card; open: bool
             type="button"
             onClick={onOpen}
             aria-expanded={false}
-            className="flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl border-2 border-band bg-surface text-[18px] font-bold text-ink active:bg-surface-2 dark:border-line"
+            className="flex min-h-13 w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-band bg-surface text-[16px] font-bold text-ink active:bg-surface-2 dark:border-line"
           >
             <IconEye /> Show Story &amp; Solution
           </button>
